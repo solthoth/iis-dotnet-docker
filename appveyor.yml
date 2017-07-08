@@ -1,0 +1,21 @@
+version: 0.0.{build}
+image: Visual Studio 2017
+
+environment:
+  DOCKER_USER:
+    secure: zYh2E1Ev8iysKYqh1JQnjA==
+  DOCKER_PASS:
+    secure: fzKLKWlgyXg+GYPF9tvvrA==
+
+install:
+  docker version
+build_script:
+  - docker build -t solthoth/iis-dotnet:latest .
+  - ps: docker tag solthoth/iis-dotnet:latest solthoth/iis-dotnet:"$env:APPVEYOR_BUILD_VERSION"
+before_deploy:
+  ps: docker login -u "$env:DOCKER_USER" -p "$env:DOCKER_PASS"
+deploy_script:
+  - docker push solthoth/iis-dotnet:latest
+  - ps: docker push solthoth/iis-dotnet:"$env:APPVEYOR_BUILD_VERSION"
+after_deploy:
+  docker logout
